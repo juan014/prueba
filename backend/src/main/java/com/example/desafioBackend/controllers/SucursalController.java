@@ -43,12 +43,13 @@ public class SucursalController {
         List<ClaseDTO> dto = claseList.stream().
                 map(clase -> new ClaseDTO(
                         clase.getNroClase(),
-                        clase.getTipoClase().getNroTipoClase(),
+                        clase.getTipoClase().getNombre(),
                         clase.getFecha(),
                         clase.getHora(),
                         clase.getCapacidad(),
                         clase.getInscriptos(),
-                        clase.getEntrenador().getDni()
+                        clase.getEntrenador().getNombre(),
+                        clase.getSucursal().getNombre()
                 )).toList();
         return ResponseEntity.ok(dto);
     }

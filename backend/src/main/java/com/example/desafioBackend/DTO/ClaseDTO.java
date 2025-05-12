@@ -4,11 +4,13 @@ import java.time.LocalDate;
 
 public record ClaseDTO (
         int nroClase,
-        int tipoClase,
+        String nombreClase,
         String fecha,
         String hora,
         int capacidad,
         int inscriptos,
-        int dniEntrenador
+        String nombreEntrenador,
+        String nombreSucursal
+
 ) {
 }

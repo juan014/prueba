@@ -25,7 +25,8 @@ public class Socio {
     private String telefono;
     @OneToMany(mappedBy = "socio", fetch = FetchType.LAZY)
     private List<Reserva> reservas;
-    private int clasesGratis = 0;
+    @OneToMany(mappedBy = "socio", fetch = FetchType.LAZY)
+    private List<ClaseGratis> claseGratis;
 
 
 

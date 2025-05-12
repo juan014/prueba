@@ -96,12 +96,14 @@ public class SocioController {
                     Clase clase = reserva.getClase();
                     ClaseDTO claseDTO = new ClaseDTO(
                             clase.getNroClase(),
-                            clase.getTipoClase().getNroTipoClase(),
+                            clase.getTipoClase().getNombre(),
                             clase.getFecha(),
                             clase.getHora(),
                             clase.getCapacidad(),
                             clase.getInscriptos(),
-                            clase.getEntrenador().getDni()
+                            clase.getEntrenador().getNombre(),
+                            clase.getSucursal().getNombre()
+
                     );
                     return new ReservaDTO(
                             reserva.getNroReserva(),
@@ -122,12 +124,13 @@ public class SocioController {
                     Clase clase = reserva.getClase();
                     ClaseDTO claseDTO = new ClaseDTO(
                             clase.getNroClase(),
-                            clase.getTipoClase().getNroTipoClase(),
+                            clase.getTipoClase().getNombre(),
                             clase.getFecha(),
                             clase.getHora(),
                             clase.getCapacidad(),
                             clase.getInscriptos(),
-                            clase.getEntrenador().getDni()
+                            clase.getEntrenador().getNombre(),
+                            clase.getSucursal().getNombre()
                     );
                     return new ReservaDTO(
                             reserva.getNroReserva(),

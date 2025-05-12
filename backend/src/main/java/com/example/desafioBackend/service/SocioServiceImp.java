@@ -1,8 +1,10 @@
 package com.example.desafioBackend.service;
 
 import com.example.desafioBackend.entities.Clase;
+import com.example.desafioBackend.entities.ClaseGratis;
 import com.example.desafioBackend.entities.Reserva;
 import com.example.desafioBackend.entities.Socio;
+import com.example.desafioBackend.repositories.ClaseGratisRepository;
 import com.example.desafioBackend.repositories.ClaseRepository;
 import com.example.desafioBackend.repositories.ReservaRepository;
 import com.example.desafioBackend.repositories.SocioRepository;
@@ -23,11 +25,13 @@ public class SocioServiceImp implements SocioService {
     private final SocioRepository socioRepository;
     private final ReservaRepository reservaRepository;
     private final ClaseRepository claseRepository;
+    private final ClaseGratisRepository claseGratisRepository;
 
-    public SocioServiceImp(SocioRepository socioRepository, ReservaRepository reservaRepository, ClaseRepository claseRepository) {
+    public SocioServiceImp(SocioRepository socioRepository, ReservaRepository reservaRepository, ClaseRepository claseRepository, ClaseGratisRepository claseGratisRepository) {
         this.socioRepository = socioRepository;
         this.reservaRepository = reservaRepository;
         this.claseRepository = claseRepository;
+        this.claseGratisRepository = claseGratisRepository;
     }
 
 
@@ -109,7 +113,30 @@ public class SocioServiceImp implements SocioService {
         LocalDate fechaL = LocalDate.parse(fecha);
         Month mes = fechaL.getMonth();
         List<Reserva> reservas = reservaRepository.findBySocioDni(dni);
-        List<Reserva> reservasMes = new ArrayList<>();
+        List<Reserva> reservasMes = reservas.stream()
+                        .filter(reserva -> {
+                            LocalDate reservaFecha = LocalDate.parse(reserva.getFechaReserva());
+                            Month reservaM = reservaFecha.getMonth();
+                            return reservaM == mes;
+                        }).toList();
+
+        int countAsistencia = 0;
+        for (Reserva reserva:reservasMes){
+            if (reserva.getAsistencia() == true){
+                countAsistencia++;
+            }
+        }
+        List <ClaseGratis> clasesGratis = claseGratisRepository.findBySocioDni(dni);
+        boolean usada = false;
+        for (ClaseGratis claseGratis:clasesGratis){
+            LocalDate fechaClaseGratis = LocalDate.parse(claseGratis.getFecha());
+            Month claseGratisMes = fechaClaseGratis.getMonth();
+            if (claseGratisMes == mes) {
+                usada = true;
+            }
+        }
+
+        /*
         for (Reserva reserva:reservas){
             LocalDate reservaFecha = LocalDate.parse(reserva.getFechaReserva());
             Month reservaM = reservaFecha.getMonth();
@@ -123,15 +150,32 @@ public class SocioServiceImp implements SocioService {
                 countAsistencia++;
             }
         }
-        if (countAsistencia >= 10){
-            socio.setClasesGratis(socio.getClasesGratis() + 1);
-            socioRepository.save(socio);
+        */
+        if (countAsistencia >= 10 && !usada){
+            ClaseGratis claseGratis = new ClaseGratis();
+            claseGratis.setFecha(String.valueOf(fechaL));
+            claseGratis.setSocio(socio);
+            claseGratisRepository.save(claseGratis);
         }
 
     }
 
     @Override
     public void usarClaseGratis(int dni) {
+        List<ClaseGratis> clasesGratis = claseGratisRepository.findBySocioDniAndUsadoTrue(dni);
+        if (clasesGratis.isEmpty()) {
+            throw new IllegalStateException("No hay clases gratis disponibles para este socio.");
+        } else {
+            for (ClaseGratis claseGratis:clasesGratis){
+                if (!claseGratis.isUsado()) {
+                    claseGratis.setUsado(true);
+                    claseGratisRepository.save(claseGratis);
+                    return;
+                }
+            }
+        }
+    }
+    /*
         Socio socio = socioRepository.findById(dni).orElseThrow(() -> new NoSuchElementException("Socio no encontrado: " + dni));
         if (socio.getClasesGratis() > 0){
             socio.setClasesGratis(socio.getClasesGratis()-1);
@@ -139,8 +183,8 @@ public class SocioServiceImp implements SocioService {
         }
         else {
             throw new IllegalStateException("No hay clases gratis disponibles para este socio.");
-        }
-    }
+        } */
+
 
     @Override
     public Socio add(Socio entity) {
