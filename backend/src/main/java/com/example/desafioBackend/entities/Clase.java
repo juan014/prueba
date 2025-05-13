@@ -27,7 +27,7 @@ public class Clase {
     private String fecha;
     private String hora;
     private int capacidad;
-    private int inscriptos;
+    private int inscriptos = 0;
     @ManyToOne
     @JoinColumn(name = "dniEntrenador")
     private Entrenador entrenador;

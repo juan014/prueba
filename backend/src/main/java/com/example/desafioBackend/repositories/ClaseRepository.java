@@ -12,4 +12,7 @@ public interface ClaseRepository extends JpaRepository<Clase, Integer> {
 
     List<Clase> findBySucursalNroSucursalAndFecha(int nroSucursal, String fecha);
     List<Clase> findByFechaBetween(String fechaInicio, String fechaFin);
+    Clase findByEntrenadorDniAndFechaAndHora(int dni, String fecha, String hora);
+    List<Clase> findByEntrenadorDni(int dni);
+    List<Clase> findByEntrenadorDniAndFecha(int dni, String fecha);
 }

@@ -9,6 +9,7 @@ import com.example.desafioBackend.repositories.ClaseRepository;
 import com.example.desafioBackend.repositories.ReservaRepository;
 import com.example.desafioBackend.repositories.SocioRepository;
 import com.example.desafioBackend.service.serviceInterface.SocioService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Month;
@@ -37,9 +38,10 @@ public class SocioServiceImp implements SocioService {
 
     @Override
     public Socio update(Socio entity) {
-        Optional<Socio> socioOptional = this.socioRepository.findById(entity.getDni());
-        socioOptional.ifPresent(socioRepository::save);
-        return socioOptional.orElseThrow();
+        if (!socioRepository.existsById(entity.getDni())) {
+            throw new EntityNotFoundException("Socio no encontrado con DNI: " + entity.getDni());
+        }
+        return socioRepository.save(entity);
     }
 
     @Override
@@ -162,7 +164,7 @@ public class SocioServiceImp implements SocioService {
 
     @Override
     public void usarClaseGratis(int dni) {
-        List<ClaseGratis> clasesGratis = claseGratisRepository.findBySocioDniAndUsadoTrue(dni);
+        List<ClaseGratis> clasesGratis = claseGratisRepository.findBySocioDniAndUsadoFalse(dni);
         if (clasesGratis.isEmpty()) {
             throw new IllegalStateException("No hay clases gratis disponibles para este socio.");
         } else {
@@ -174,6 +176,37 @@ public class SocioServiceImp implements SocioService {
                 }
             }
         }
+    }
+
+    @Override
+    public void reservaAsistida(int nroReserva, int dni) {
+        Reserva reserva = reservaRepository.findReservaByNroReservaAndSocio_Dni(nroReserva, dni);
+        if (reserva == null) {
+            throw new NoSuchElementException("Reserva no encontrada para el socio.");
+        }
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaClase = LocalDate.parse(reserva.getClase().getFecha());
+        if (fechaClase.isBefore(hoy)) {
+            throw new IllegalStateException("No se puede cancelar una reserva de una clase ya pasada.");
+        }
+        reserva.setAsistencia(true);
+        reservaRepository.save(reserva);
+    }
+
+    @Override
+    public void reservaInsistida(int nroReserva, int dni) {
+        Reserva reserva = reservaRepository.findReservaByNroReservaAndSocio_Dni(nroReserva, dni);
+        if (reserva == null) {
+            throw new NoSuchElementException("Reserva no encontrada para el socio.");
+        }
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaClase = LocalDate.parse(reserva.getClase().getFecha());
+        if (fechaClase.isBefore(hoy)) {
+            throw new IllegalStateException("No se puede cancelar una reserva de una clase ya pasada.");
+        }
+        reserva.setAsistencia(false);
+        reservaRepository.save(reserva);
+
     }
     /*
         Socio socio = socioRepository.findById(dni).orElseThrow(() -> new NoSuchElementException("Socio no encontrado: " + dni));

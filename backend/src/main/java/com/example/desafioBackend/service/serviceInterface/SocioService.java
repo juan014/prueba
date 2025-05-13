@@ -22,4 +22,8 @@ public interface SocioService extends Service<Socio,Integer> {
     void asistenciaClaseGratis(int dni, String fecha);
 
     void usarClaseGratis(int dni);
+
+    void reservaAsistida(int nroReserva, int dni);
+
+    void reservaInsistida(int nroReserva, int dni);
 }

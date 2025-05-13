@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface ClaseGratisRepository extends JpaRepository<ClaseGratis, Integer> {
     List<ClaseGratis> findBySocioDni(int dni);
-    List<ClaseGratis> findBySocioDniAndUsadoTrue(int dni);
+    List<ClaseGratis> findBySocioDniAndUsadoFalse(int dni);
 }

@@ -9,10 +9,7 @@ import com.example.desafioBackend.service.serviceInterface.SucursalService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 public class SucursalServiceImp implements SucursalService {
@@ -26,12 +23,14 @@ public class SucursalServiceImp implements SucursalService {
 
     @Override
     public Sucursal add(Sucursal entity) {
-        return null;
+        return sucursalRepository.save(entity);
     }
 
     @Override
     public Sucursal delete(Integer integer) {
-        return null;
+        Optional<Sucursal> sucursalOptional = sucursalRepository.findById(integer);
+        sucursalOptional.ifPresent(sucursalRepository::delete);
+        return sucursalOptional.orElse(null);
     }
 
     @Override
